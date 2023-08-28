@@ -1,119 +1,30 @@
 "use strict";
-class Person {
-    constructor(firstName, lastName, address, age) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.address = address;
-        this.age = age;
-    }
-}
-class MedicalStaff extends Person {
-    constructor(firstName, lastName, address, age, staffID, position, department) {
-        super(firstName, lastName, address, age);
-        this.staffID = staffID;
-        this.position = position;
-        this.department = department;
-    }
-    info() {
-        return ``;
-    }
-}
-class Patient extends Person {
-    constructor(firstName, lastName, address, age, patientId, phoneNumber, medicalHistory, emergencyContact) {
-        super(firstName, lastName, address, age);
-        this.patientId = patientId;
-        this.phoneNumber = phoneNumber;
-        this.emergencyContact = emergencyContact;
-        this.medicalHistory = medicalHistory;
-    }
-    info() {
-        return `id: ${this.patientId} name: ${this.firstName} ${this.lastName} age: ${this.age} address: ${this.address} medical history ${this.medicalHistory}`;
-    }
-    updateMedicalHistory(appointment) {
-        var _a;
-        (_a = this.medicalHistory) === null || _a === void 0 ? void 0 : _a.push(appointment);
-    }
-}
-class Doctor extends MedicalStaff {
-    constructor(firstName, lastName, address, age, staffID, position, department, doctorId) {
-        super(firstName, lastName, address, age, staffID, position, department);
-        this.doctorId = doctorId;
-    }
-    info() {
-        return `id: ${this.doctorId} name: ${this.firstName} ${this.lastName} age: ${this.age} address: ${this.address}`;
-    }
-}
-class Appointment {
-    constructor(patient, doctor, date, time) {
-        this.patient = patient;
-        this.doctor = doctor;
-        this.date = date;
-        this.time = time;
-    }
-    appointmentInfo() {
-        return `date - ${(this.date, this.time)}, doctor- ${this.doctor.info()}, patient - ${this.patient.info()} `;
-    }
-}
-class Hospital {
-    constructor(patients, doctors, appointments, hospitalName) {
-        this.patients = patients;
-        this.doctors = doctors;
-        this.appointments = appointments;
-        this.hospitalName = hospitalName;
-    }
-    addPatient(newPatient) {
-        this.patients.push(newPatient);
-    }
-    addDoctor(newDoctor) {
-        this.doctors.push(newDoctor);
-    }
-    addAppointment(newAppointment) {
-        this.appointments.push(newAppointment);
-    }
-    showAppointments() {
-        return this.appointments;
-    }
-    showDoctorAppointments(doctorId, arr) {
-        const newArr = [];
-        arr.forEach((appointment) => {
-            if ((appointment.doctor.doctorId = doctorId))
-                newArr.push(appointment);
-        });
-        return newArr;
-    }
-    showPatientAppointments(PatientId, arr) {
-        const newArr = [];
-        arr.forEach((appointment) => {
-            if ((appointment.patient.patientId = PatientId))
-                newArr.push(appointment);
-        });
-        return newArr;
-    }
-    showDaysAppointments(date, arr) {
-        const newArr = [];
-        arr.forEach((appointment) => {
-            if ((appointment.date = date))
-                newArr.push(appointment);
-        });
-        return newArr;
-    }
-}
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Patient_1 = __importDefault(require("./models/Patient"));
+const Doctor_1 = __importDefault(require("./models/Doctor"));
+const Hospital_1 = __importDefault(require("./models/Hospital"));
+const Appointment_1 = __importDefault(require("./models/Appointment"));
+const TimeSlot_1 = __importDefault(require("./models/TimeSlot"));
+const Availability_1 = __importDefault(require("./models/Availability"));
 // Create patients
-const patient1 = new Patient("John", "Doe", "123 Main St", 30, 1, 5551234, [], 5552345);
-const patient2 = new Patient("Jane", "Doe", "456 Park Ave", 28, 2, 5555678, [], 5558765);
+const patient1 = new Patient_1.default("John", "Doe", "123 Main St", 30, 1, 5551234, [], 5552345);
+const patient2 = new Patient_1.default("Jane", "Doe", "456 Park Ave", 28, 2, 5555678, [], 5558765);
 // Create doctors
-const doctor1 = new Doctor("Mary", "Williams", "789 1st St", 40, 101, "Cardiologist", "Cardiology", 1001);
-const doctor2 = new Doctor("Michael", "Davis", "321 2nd St", 45, 102, "Oncologist", "Oncology", 1002);
+const doctor1 = new Doctor_1.default("Mary", "Williams", "789 1st St", 40, 101, "Cardiologist", "Cardiology", 1001);
+const doctor2 = new Doctor_1.default("Michael", "Davis", "321 2nd St", 45, 102, "Oncologist", "Oncology", 1002);
 // Create hospital
-const hospital = new Hospital([], [], [], "Mercy Hospital");
+const hospital = new Hospital_1.default([], [], [], "Mercy Hospital");
 // Add patients and doctors
 hospital.addPatient(patient1);
 hospital.addPatient(patient2);
 hospital.addDoctor(doctor1);
 hospital.addDoctor(doctor2);
 // Create appointments
-const appointment1 = new Appointment(patient1, doctor1, new Date("2023-03-14"), "10:00am");
-const appointment2 = new Appointment(patient2, doctor2, new Date("2023-03-16"), "2:00pm");
+const appointment1 = new Appointment_1.default(patient1, doctor1, new TimeSlot_1.default(new Date("2023-03-14"), new Date("10:00"), new Date("16:00")));
+const appointment2 = new Appointment_1.default(patient2, doctor2, new TimeSlot_1.default(new Date("2023-03-14"), new Date("10:00"), new Date("16:00")));
 // Add appointments
 hospital.addAppointment(appointment1);
 hospital.addAppointment(appointment2);
@@ -123,3 +34,22 @@ const doctor1Appts = hospital.showDoctorAppointments(doctor1.doctorId, hospital.
 const patient1Appts = hospital.showPatientAppointments(patient1.patientId, hospital.appointments);
 console.log(doctor1Appts); // [appointment1]
 console.log(patient1Appts); // [appointment1]
+// Add availability for doctors
+const slot1 = new TimeSlot_1.default(new Date("2023-03-14"), new Date("09:00"), new Date("12:00"));
+const slot2 = new TimeSlot_1.default(new Date("2023-03-15"), new Date("10:00"), new Date("16:00"));
+const availability1 = new Availability_1.default();
+const availability2 = new Availability_1.default();
+availability1.addTimeSlot(slot1);
+availability2.addTimeSlot(slot2);
+// Check availability
+const dateToCheck = new Date("2023-03-14");
+const availableSlotsDoctor1 = availability1.getAvailableSlots(dateToCheck);
+console.log(`Available slots for Doctor 1 on ${dateToCheck.toDateString()}: `);
+availableSlotsDoctor1.forEach((slot) => {
+    console.log(`From ${slot.startTime.toTimeString()} to ${slot.endTime.toTimeString()}`);
+});
+const availableSlotsDoctor2 = availability2.getAvailableSlots(dateToCheck);
+console.log(`Available slots for Doctor 2 on ${dateToCheck.toDateString()}: `);
+availableSlotsDoctor2.forEach((slot) => {
+    console.log(`From ${slot.startTime.toTimeString()} to ${slot.endTime.toTimeString()}`);
+});

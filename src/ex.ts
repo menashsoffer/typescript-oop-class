@@ -1,172 +1,10 @@
-abstract class Person {
-  firstName: string;
-  lastName: string;
-  address: string;
-  age: number;
-  constructor(
-    firstName: string,
-    lastName: string,
-    address: string,
-    age: number
-  ) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.address = address;
-    this.age = age;
-  }
-  abstract info(): string;
-}
+import Patient from "./models/Patient";
+import Doctor from "./models/Doctor";
+import Hospital from "./models/Hospital";
+import Appointment from "./models/Appointment";
+import TimeSlot from "./models/TimeSlot";
+import Availability from "./models/Availability";
 
-abstract class MedicalStaff extends Person {
-  readonly staffID: number;
-  position: string;
-  department: string;
-  constructor(
-    firstName: string,
-    lastName: string,
-    address: string,
-    age: number,
-    staffID: number,
-    position: string,
-    department: string
-  ) {
-    super(firstName, lastName, address, age);
-    this.staffID = staffID;
-    this.position = position;
-    this.department = department;
-  }
-  info(): string {
-    return ``;
-  }
-}
-
-class Patient extends Person {
-  patientId: number;
-  phoneNumber: number;
-  emergencyContact?: number;
-  medicalHistory?: Appointment[];
-
-  constructor(
-    firstName: string,
-    lastName: string,
-    address: string,
-    age: number,
-    patientId: number,
-    phoneNumber: number,
-    medicalHistory?: Appointment[],
-    emergencyContact?: number
-  ) {
-    super(firstName, lastName, address, age);
-    this.patientId = patientId;
-    this.phoneNumber = phoneNumber;
-    this.emergencyContact = emergencyContact;
-    this.medicalHistory = medicalHistory;
-  }
-
-  info() {
-    return `id: ${this.patientId} name: ${this.firstName} ${this.lastName} age: ${this.age} address: ${this.address} medical history ${this.medicalHistory}`;
-  }
-  updateMedicalHistory(appointment: Appointment) {
-    this.medicalHistory?.push(appointment);
-  }
-}
-
-class Doctor extends MedicalStaff {
-  doctorId: number;
-  constructor(
-    firstName: string,
-    lastName: string,
-    address: string,
-    age: number,
-    staffID: number,
-    position: string,
-    department: string,
-    doctorId: number
-  ) {
-    super(firstName, lastName, address, age, staffID, position, department);
-    this.doctorId = doctorId;
-  }
-  info() {
-    return `id: ${this.doctorId} name: ${this.firstName} ${this.lastName} age: ${this.age} address: ${this.address}`;
-  }
-}
-
-class Appointment {
-  patient: Patient;
-  doctor: Doctor;
-  date: Date;
-  time: string;
-  constructor(patient: Patient, doctor: Doctor, date: Date, time: string) {
-    this.patient = patient;
-    this.doctor = doctor;
-    this.date = date;
-    this.time = time;
-  }
-  appointmentInfo() {
-    return `date - ${
-      (this.date, this.time)
-    }, doctor- ${this.doctor.info()}, patient - ${this.patient.info()} `;
-  }
-}
-
-class Hospital {
-  patients: Patient[];
-  doctors: Doctor[];
-  appointments: Appointment[];
-  hospitalName: string;
-
-  constructor(
-    patients: Patient[],
-    doctors: Doctor[],
-    appointments: Appointment[],
-    hospitalName: string
-  ) {
-    this.patients = patients;
-    this.doctors = doctors;
-    this.appointments = appointments;
-    this.hospitalName = hospitalName;
-  }
-
-  addPatient(newPatient: Patient) {
-    this.patients.push(newPatient);
-  }
-
-  addDoctor(newDoctor: Doctor) {
-    this.doctors.push(newDoctor);
-  }
-
-  addAppointment(newAppointment: Appointment) {
-    this.appointments.push(newAppointment);
-  }
-
-  showAppointments() {
-    return this.appointments;
-  }
-
-  showDoctorAppointments(doctorId: number, arr: Appointment[]) {
-    const newArr: Appointment[] = [];
-    arr.forEach((appointment) => {
-      if ((appointment.doctor.doctorId = doctorId)) newArr.push(appointment);
-    });
-    return newArr;
-  }
-
-  showPatientAppointments(PatientId: number, arr: Appointment[]) {
-    const newArr: Appointment[] = [];
-    arr.forEach((appointment) => {
-      if ((appointment.patient.patientId = PatientId)) newArr.push(appointment);
-    });
-    return newArr;
-  }
-
-  showDaysAppointments(date: Date, arr: Appointment[]) {
-    const newArr: Appointment[] = [];
-    arr.forEach((appointment) => {
-      if ((appointment.date = date)) newArr.push(appointment);
-    });
-    return newArr;
-  }
-}
 // Create patients
 const patient1 = new Patient(
   "John",
@@ -225,14 +63,12 @@ hospital.addDoctor(doctor2);
 const appointment1 = new Appointment(
   patient1,
   doctor1,
-  new Date("2023-03-14"),
-  "10:00am"
+  new TimeSlot(new Date("2023-03-14"), new Date("10:00"), new Date("16:00"))
 );
 const appointment2 = new Appointment(
   patient2,
   doctor2,
-  new Date("2023-03-16"),
-  "2:00pm"
+  new TimeSlot(new Date("2023-03-14"), new Date("10:00"), new Date("16:00"))
 );
 
 // Add appointments
@@ -253,3 +89,40 @@ const patient1Appts = hospital.showPatientAppointments(
 
 console.log(doctor1Appts); // [appointment1]
 console.log(patient1Appts); // [appointment1]
+
+// Add availability for doctors
+const slot1 = new TimeSlot(
+  new Date("2023-03-14"),
+  new Date("09:00"),
+  new Date("12:00")
+);
+const slot2 = new TimeSlot(
+  new Date("2023-03-15"),
+  new Date("10:00"),
+  new Date("16:00")
+);
+
+const availability1 = new Availability();
+const availability2 = new Availability();
+
+availability1.addTimeSlot(slot1);
+availability2.addTimeSlot(slot2);
+
+// Check availability
+const dateToCheck = new Date("2023-03-14");
+
+const availableSlotsDoctor1 = availability1.getAvailableSlots(dateToCheck);
+console.log(`Available slots for Doctor 1 on ${dateToCheck.toDateString()}: `);
+availableSlotsDoctor1.forEach((slot: any) => {
+  console.log(
+    `From ${slot.startTime.toTimeString()} to ${slot.endTime.toTimeString()}`
+  );
+});
+
+const availableSlotsDoctor2 = availability2.getAvailableSlots(dateToCheck);
+console.log(`Available slots for Doctor 2 on ${dateToCheck.toDateString()}: `);
+availableSlotsDoctor2.forEach((slot) => {
+  console.log(
+    `From ${slot.startTime.toTimeString()} to ${slot.endTime.toTimeString()}`
+  );
+});
